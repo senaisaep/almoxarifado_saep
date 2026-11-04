@@ -1,5 +1,4 @@
--- Estado inicial do banco entregue pelo aplicador.
--- Não inclui usuários/perfis, data/hora ou responsável pela movimentação.
+-- Banco inicial do sistema de almoxarifado.
 
 CREATE DATABASE IF NOT EXISTS almoxarifado_saep
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -7,6 +6,17 @@ USE almoxarifado_saep;
 
 DROP TABLE IF EXISTS movimentacoes;
 DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS usuarios;
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(120) NOT NULL,
+    usuario VARCHAR(80) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    perfil ENUM('operador', 'administrador') NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -14,16 +24,22 @@ CREATE TABLE produtos (
     descricao TEXT,
     preco DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     quantidade_estoque INT NOT NULL DEFAULT 0,
-    data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    tipo ENUM('entrada', 'saida') NOT NULL,
     quantidade INT NOT NULL,
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INT NULL,
+    usuario_nome VARCHAR(120) NOT NULL,
     CONSTRAINT fk_movimentacoes_produtos
-        FOREIGN KEY (produto_id) REFERENCES produtos(id)
+        FOREIGN KEY (produto_id) REFERENCES produtos(id),
+    CONSTRAINT fk_movimentacoes_usuarios
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
@@ -36,7 +52,8 @@ INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
 ('Pano de chão', 'Pano de algodão', 6.00, 22),
 ('Álcool 70% 1L', 'Álcool para limpeza', 9.90, 12);
 
-INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES
-(1, 'entrada', 40), (2, 'entrada', 25), (3, 'entrada', 30),
-(4, 'entrada', 18), (5, 'entrada', 60), (6, 'entrada', 15),
-(7, 'entrada', 22), (8, 'entrada', 12);
+INSERT INTO movimentacoes (produto_id, tipo, quantidade, usuario_nome) VALUES
+(1, 'entrada', 40, 'Carga inicial'), (2, 'entrada', 25, 'Carga inicial'),
+(3, 'entrada', 30, 'Carga inicial'), (4, 'entrada', 18, 'Carga inicial'),
+(5, 'entrada', 60, 'Carga inicial'), (6, 'entrada', 15, 'Carga inicial'),
+(7, 'entrada', 22, 'Carga inicial'), (8, 'entrada', 12, 'Carga inicial');

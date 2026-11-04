@@ -1,0 +1,11 @@
+CENÁRIO 2 — Quantidade solicitada maior que o saldo
+Data da execucao: 2026-11-04
+Comando: python -m unittest -v tests.test_saida_produto.SaidaProdutoTests.test_cenario2_saida_maior_que_saldo_disponivel
+Saída: test_cenario2_saida_maior_que_saldo_disponivel ... ok; Ran 1 test in 0.020s; OK
+
+Entrada: produto_id=12, quantidade=3
+Pré-condição: produto ativo com 2 unidades e operadora autenticada.
+Resultado observado: HTTP 409; saldo permaneceu 2; nenhuma movimentação criada; transação não confirmada.
+Conclusão: APROVADO
+
+Nota: teste automatizado com banco simulado; não requer conexão MySQL.

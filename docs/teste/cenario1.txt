@@ -1,0 +1,11 @@
+CENÁRIO 1 — Saída com saldo suficiente
+Data da execucao: 2026-11-04
+Comando: python -m unittest -v tests.test_saida_produto.SaidaProdutoTests.test_cenario1_saida_com_saldo_suficiente
+Saída: test_cenario1_saida_com_saldo_suficiente ... ok; Ran 1 test in 0.019s; OK
+
+Entrada: produto_id=12, quantidade=4
+Pré-condição: produto ativo com 10 unidades e operadora autenticada.
+Resultado observado: HTTP 201; saldo final 6; saída registrada para a usuária 7 (Ana Operadora); transação confirmada.
+Conclusão: APROVADO
+
+Nota: teste automatizado com banco simulado. No MySQL, data_hora é preenchida por DEFAULT CURRENT_TIMESTAMP.
