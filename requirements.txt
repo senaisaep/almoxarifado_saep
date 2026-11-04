@@ -1,3 +1,8 @@
-Flask==3.1.1
-mysql-connector-python==9.4.0
-python-dotenv==1.1.1
+Fastapi=0.162.0
+Uvicorn==0.54.0
+Sqlalchemy==2.1.6
+bcrypt==5.0.0
+pydantic=2.14.1
+jwt=
+email-validator==
+
