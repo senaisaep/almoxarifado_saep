@@ -1,0 +1,29 @@
+<h1> ESTOQUE </h1>
+<html>
+    {{ vendas }}
+    <table>
+        <thead>
+            <tr>
+                <th> Produto </th>
+                <th> Quantidade </th>
+                <th> Preço </th>
+            </tr>
+        </thead>
+        <tbody> 
+            {% for venda in vendas %}
+            <tr>
+                <td> {{ venda[0] }} </td>
+                <td> {{ venda[1] }}</td>
+                <td> {{ venda[2] }}</td>
+                <td> {{ venda[3] }}</td>
+                <td> {{ venda[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <thead>
+            <tr>
+                <td> {{ delet[] }} </td>
+            </tr>
+        </thead>
+    </table>
+</html>
