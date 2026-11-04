@@ -1,15 +1,21 @@
-from flask import Blueprint, request, jsonify
-from src.config.db import conectar
+from flask import Blueprint, request, jsonify, session, render_template, abort
+from db import conectar
 
 estoque = Blueprint("estoque", __name__)
 
-# Lógica de negócio e comandos SQL concentrados neste arquivo de rotas.
+@estoque.route("/home")
+def home():
+    return render_template("home.html")
 
 @estoque.route("/produtos", methods=["GET"])
 def listar_produtos():
+    if session["usuario"]["permissao"] == "opr" or session["usuario"]["permissao"] == "adm":
+        return render_template("produtos.html")
+    else:
+        abort(403)
     conexao = conectar()
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM produtos ORDER BY id")
+    cursor.execute("""SELECT * FROM produtos ORDER BY id""")
     dados = cursor.fetchall()
     cursor.close()
     conexao.close()
@@ -18,9 +24,13 @@ def listar_produtos():
 
 @estoque.route("/produtos/<int:produto_id>", methods=["GET"])
 def consultar_produto(produto_id):
+    if session["usuario"]["permissao"] == "adm":
+        return render_template("produtos.html")
+    else:
+        abort(403)
     conexao = conectar()
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM produtos WHERE id = %s", (produto_id,))
+    cursor.execute("""SELECT * FROM produtos WHERE id = ?""", (produto_id,))
     produto = cursor.fetchone()
     cursor.close()
     conexao.close()
@@ -31,6 +41,10 @@ def consultar_produto(produto_id):
 
 @estoque.route("/produtos", methods=["POST"])
 def cadastrar_produto():
+    if session["usuario"]["permissao"] == "opr" or session["usuario"]["permissao"] == "adm":
+        return render_template("produtos.html")
+    else:
+        abort(403)
     dados = request.get_json(silent=True) or {}
     if not dados.get("nome"):
         return jsonify({"mensagem": "O nome do produto é obrigatório."}), 400
@@ -38,9 +52,9 @@ def cadastrar_produto():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute(
-        "INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES (%s, %s, %s, %s)",
-        (dados["nome"], dados.get("descricao", ""), dados.get("preco", 0),
-         dados.get("quantidade_estoque", 0))
+        """INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES (?,?,?,?)""",
+        (dados["nome"], dados.get("descricao", ""), dados.get("preco", ""),
+         dados.get("quantidade_estoque", ""))
     )
     conexao.commit()
     novo_id = cursor.lastrowid
@@ -49,17 +63,21 @@ def cadastrar_produto():
     return jsonify({"mensagem": "Produto cadastrado.", "id": novo_id}), 201
 
 
-@estoque.route("/produtos/<int:produto_id>", methods=["PUT"])
+@estoque.route("/produtos/<produto_id>", methods=["PUT"])
 def atualizar_produto(produto_id):
+    if session["usuario"]["permissao"] == "opr" or session["usuario"]["permissao"] == "adm":
+        return render_template("produtos_id.html")
+    else:
+        abort(403)
     dados = request.get_json(silent=True) or {}
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute(
         """UPDATE produtos
-           SET nome=%s, descricao=%s, preco=%s, quantidade_estoque=%s
-           WHERE id=%s""",
+           SET nome=?, descricao=?, preco=?, quantidade_estoque=?
+           WHERE id=?""",
         (dados.get("nome"), dados.get("descricao", ""), dados.get("preco", 0),
-         dados.get("quantidade_estoque", 0), produto_id)
+         dados.get("quantidade_estoque", ""), produto_id)
     )
     conexao.commit()
     alterados = cursor.rowcount
@@ -70,11 +88,15 @@ def atualizar_produto(produto_id):
     return jsonify({"mensagem": "Produto atualizado."}), 200
 
 
-@estoque.route("/produtos/<int:produto_id>", methods=["DELETE"])
+@estoque.route("/produtos/<produto_id>", methods=["DELETE"])
 def remover_produto(produto_id):
+    if session["usuario"]["permissao"] == "adm":
+        return render_template("produtos_id.html")
+    else:
+        abort(403)
     conexao = conectar()
     cursor = conexao.cursor()
-    cursor.execute("DELETE FROM produtos WHERE id=%s", (produto_id,))
+    cursor.execute("""DELETE FROM produtos WHERE id=?""", (produto_id,))
     conexao.commit()
     removidos = cursor.rowcount
     cursor.close()
@@ -86,6 +108,10 @@ def remover_produto(produto_id):
 
 @estoque.route("/movimentacoes", methods=["GET"])
 def listar_movimentacoes():
+    if session["usuario"]["permissao"] == "opr" or session["usuario"]["permissao"] == "adm":
+        return render_template("movimentacoes.html")
+    else:
+        abort(403)
     conexao = conectar()
     cursor = conexao.cursor(dictionary=True)
     cursor.execute(
@@ -102,6 +128,10 @@ def listar_movimentacoes():
 
 @estoque.route("/movimentacoes/entrada", methods=["POST"])
 def registrar_entrada():
+    if session["usuario"]["permissao"] == "opr" or session["usuario"]["permissao"] == "adm":
+        return render_template("movimentacoes_entrada.html")
+    else:
+        abort(403)
     dados = request.get_json(silent=True) or {}
     produto_id = dados.get("produto_id")
     quantidade = dados.get("quantidade")
@@ -112,12 +142,12 @@ def registrar_entrada():
     conexao = conectar()
     cursor = conexao.cursor()
     cursor.execute(
-        "INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES (%s, 'entrada', %s)",
-        (produto_id, int(quantidade))
+        """INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES (?, "entrada", ?)""",
+        (produto_id, quantidade)
     )
     cursor.execute(
-        "UPDATE produtos SET quantidade_estoque=quantidade_estoque+%s WHERE id=%s",
-        (int(quantidade), produto_id)
+        """UPDATE produtos SET quantidade_estoque=quantidade_estoque+? WHERE id=?""",
+        (quantidade, produto_id)
     )
     conexao.commit()
     cursor.close()
