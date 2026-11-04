@@ -1,13 +1,26 @@
--- Estado inicial do banco entregue pelo aplicador.
--- Não inclui usuários/perfis, data/hora ou responsável pela movimentação.
-
+  
 CREATE DATABASE IF NOT EXISTS almoxarifado_saep
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
 USE almoxarifado_saep;
 
 DROP TABLE IF EXISTS movimentacoes;
 DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS usuarios;
 
+-- TABELA DE USUARIOS
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(120) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    perfil ENUM('administrador', 'operador') NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- TABELA DE PRODUTOS
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(120) NOT NULL,
@@ -17,16 +30,26 @@ CREATE TABLE produtos (
     data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- TABELA DE MOVIMENTACOES
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    usuario_id INT NOT NULL,
+    tipo ENUM('entrada', 'saida') NOT NULL,
     quantidade INT NOT NULL,
-    CONSTRAINT fk_movimentacoes_produtos
-        FOREIGN KEY (produto_id) REFERENCES produtos(id)
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_mov_produto
+        FOREIGN KEY (produto_id) REFERENCES produtos(id),
+
+    CONSTRAINT fk_mov_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
-INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
+-- PRODUTOS INICIAIS
+INSERT INTO produtos
+(nome, descricao, preco, quantidade_estoque)
+VALUES
 ('Detergente neutro 500ml', 'Detergente líquido para limpeza geral', 3.50, 40),
 ('Água sanitária 1L', 'Alvejante para limpeza', 5.90, 25),
 ('Desinfetante lavanda 2L', 'Desinfetante perfumado', 8.75, 30),
@@ -35,8 +58,3 @@ INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
 ('Luva de borracha', 'Luva reutilizável para limpeza', 7.50, 15),
 ('Pano de chão', 'Pano de algodão', 6.00, 22),
 ('Álcool 70% 1L', 'Álcool para limpeza', 9.90, 12);
-
-INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES
-(1, 'entrada', 40), (2, 'entrada', 25), (3, 'entrada', 30),
-(4, 'entrada', 18), (5, 'entrada', 60), (6, 'entrada', 15),
-(7, 'entrada', 22), (8, 'entrada', 12);
