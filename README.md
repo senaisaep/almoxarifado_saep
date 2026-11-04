@@ -1,7 +1,5 @@
 # Sistema de Almoxarifado - Projeto inicial SAEP
 
-Projeto-base do aplicador. A lógica foi mantida propositalmente concentrada em poucas partes para que o estudante analise e reorganize a aplicação.
-
 ## Tecnologias
 Python, Flask e MySQL.
 
@@ -49,7 +47,7 @@ Exemplo de entrada:
 {"produto_id":1,"quantidade":10}
 ```
 
-## Limitações intencionais do projeto inicial
+## Limitações do projeto inicial
 - Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
 - Não possui paginação nem filtros na listagem de produtos.
 - As movimentações não armazenam data/hora nem usuário responsável.
