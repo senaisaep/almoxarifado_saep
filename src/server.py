@@ -1,16 +1,29 @@
-from flask import Flask, jsonify
-from src.routes.estoque import estoque
-import os
+from flask import Flask
 from dotenv import load_dotenv
+import os
+
+from routes.auth import auth_bp
+from routes.estoque import estoque_bp
 
 load_dotenv()
 
 app = Flask(__name__)
-app.register_blueprint(estoque)
 
-@app.route("/", methods=["GET"])
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "chave_secreta_do_projeto"
+)
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(estoque_bp)
+
+
+@app.route("/")
 def inicio():
-    return jsonify({"mensagem": "API do Sistema de Almoxarifado"}), 200
+    return {
+        "mensagem": "Sistema de Almoxarifado funcionando!"
+    }
+
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=int(os.getenv("PORT", "5000")), debug=True)
+    app.run(debug=True)
