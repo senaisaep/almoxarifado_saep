@@ -1,0 +1,15 @@
+﻿<html>
+    <body>
+        <h1>Lista de Produtos</h1>
+        <a href="/registrar">Cadastrar produto</a> |
+        <a href="/retirar">Retirar produto</a>
+        <hr>
+        <ul>
+            {% for produto in produtos %}
+                <li>
+                    {{ produto.nome }} - R$ {{ produto.preco }} - Estoque: {{ produto.quantidade_estoque }}
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

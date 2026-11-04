@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    {% if erro %}
+      <p style="color: red;">{{ erro }}</p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('sistema.login') }}">
+      <label for="usuario">Usuário:</label>
+      <input type="text" id="usuario" name="usuario" required><br><br>
+
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" name="senha" required><br><br>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <p>Usuários de teste:</p>
+    <ul>
+      <li>admin / admin123</li>
+      <li>estoque / estoque123</li>
+      <li>relatorios / relatorio123</li>
+    </ul>
+  </body>
+</html>

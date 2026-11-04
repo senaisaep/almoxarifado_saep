@@ -1,0 +1,19 @@
+﻿<html>
+    <body>
+        <h1>Retirar Produto</h1>
+        <form action="/retirar" method="post">
+            <label for="produto_id">Produto:</label>
+            <select id="produto_id" name="produto_id" required>
+                {% for produto in produtos %}
+                    <option value="{{ produto.id }}">{{ produto.nome }} (estoque: {{ produto.quantidade_estoque }})</option>
+                {% endfor %}
+            </select><br><br>
+
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" id="quantidade" name="quantidade" min="1" required><br><br>
+
+            <input type="submit" value="Retirar">
+        </form>
+        <p><a href="/lista_produtos">Voltar para lista</a></p>
+    </body>
+</html>

@@ -1,4 +1,4 @@
--- Estado inicial do banco entregue pelo aplicador.
+﻿-- Estado inicial do banco entregue pelo aplicador.
 -- Não inclui usuários/perfis, data/hora ou responsável pela movimentação.
 
 CREATE DATABASE IF NOT EXISTS almoxarifado_saep
@@ -20,7 +20,7 @@ CREATE TABLE produtos (
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    tipo ENUM('entrada', 'saida') NOT NULL,
     quantidade INT NOT NULL,
     CONSTRAINT fk_movimentacoes_produtos
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
