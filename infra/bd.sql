@@ -20,12 +20,13 @@ CREATE TABLE produtos (
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    tipo ENUM('entrada', 'saida') NOT NULL,
     quantidade INT NOT NULL,
+    data_movimentacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    usuario_responsavel VARCHAR(100) NOT NULL DEFAULT 'Sistema',
     CONSTRAINT fk_movimentacoes_produtos
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
-
 INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
 ('Detergente neutro 500ml', 'Detergente líquido para limpeza geral', 3.50, 40),
 ('Água sanitária 1L', 'Alvejante para limpeza', 5.90, 25),
