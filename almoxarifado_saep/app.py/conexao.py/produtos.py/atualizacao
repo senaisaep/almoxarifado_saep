@@ -1,0 +1,31 @@
+from conexao import conectar
+
+def atualizar_produto(id, nome, descricao, preco):
+
+    if not nome.strip() or preco < 0:
+        raise ValueError("Dados inválidos.")
+
+    banco = conectar()
+    cursor = banco.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE produtos
+            SET nome = %s,
+                descricao = %s,
+                preco = %s
+            WHERE id = %s
+        """, (nome, descricao, preco, id))
+
+        if cursor.rowcount == 0:
+            raise ValueError("Produto não encontrado.")
+
+        banco.commit()
+
+    except Exception:
+        banco.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        banco.close()

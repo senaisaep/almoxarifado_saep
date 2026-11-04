@@ -1,0 +1,39 @@
+from conexao import conectar
+
+def excluir_produto(id):
+
+    banco = conectar()
+    cursor = banco.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM movimentacoes
+            WHERE produto_id = %s
+        """, (id,))
+
+        quantidade = cursor.fetchone()[0]
+
+        if quantidade > 0:
+            raise ValueError(
+                "Não é possível excluir um produto "
+                "que possui histórico de movimentações."
+            )
+
+        cursor.execute(
+            "DELETE FROM produtos WHERE id = %s",
+            (id,)
+        )
+
+        if cursor.rowcount == 0:
+            raise ValueError("Produto não encontrado.")
+
+        banco.commit()
+
+    except Exception:
+        banco.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        banco.close()

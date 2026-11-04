@@ -1,0 +1,64 @@
+from conexao import conectar
+
+def movimentar_estoque(produto_id, tipo, quantidade, usuario_id):
+
+    if quantidade <= 0:
+        raise ValueError("Quantidade deve ser maior que zero.")
+
+    if tipo not in ("entrada", "saida"):
+        raise ValueError("Tipo de movimentação inválido.")
+
+    banco = conectar()
+    cursor = banco.cursor(dictionary=True)
+
+    try:
+        banco.start_transaction()
+
+        cursor.execute("""
+            SELECT quantidade_estoque
+            FROM produtos
+            WHERE id = %s
+            FOR UPDATE
+        """, (produto_id,))
+
+        produto = cursor.fetchone()
+
+        if produto is None:
+            raise ValueError("Produto não encontrado.")
+
+        saldo = produto["quantidade_estoque"]
+
+        if tipo == "saida" and quantidade > saldo:
+            raise ValueError(
+                f"Saída não permitida: estoque insuficiente. "
+                f"Disponível: {saldo}. Solicitado: {quantidade}."
+            )
+
+        if tipo == "entrada":
+            novo_saldo = saldo + quantidade
+        else:
+            novo_saldo = saldo - quantidade
+
+        cursor.execute("""
+            UPDATE produtos
+            SET quantidade_estoque = %s
+            WHERE id = %s
+        """, (novo_saldo, produto_id))
+
+        cursor.execute("""
+            INSERT INTO movimentacoes
+            (produto_id, tipo, quantidade, usuario_id, data_hora)
+            VALUES (%s, %s, %s, %s, NOW())
+        """, (produto_id, tipo, quantidade, usuario_id))
+
+        banco.commit()
+
+        return novo_saldo
+
+    except Exception:
+        banco.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        banco.close()

@@ -1,0 +1,46 @@
+from conexao import conectar
+
+def cadastrar_produto(nome, descricao, preco, quantidade):
+
+    if not nome.strip():
+        raise ValueError("O nome é obrigatório.")
+
+    if preco < 0 or quantidade < 0:
+        raise ValueError("Preço e quantidade não podem ser negativos.")
+
+    banco = conectar()
+    cursor = banco.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO produtos
+            (nome, descricao, preco, quantidade_estoque)
+            VALUES (%s, %s, %s, %s)
+        """, (nome, descricao, preco, quantidade))
+
+        banco.commit()
+
+        return cursor.lastrowid
+
+    finally:
+        cursor.close()
+        banco.close()
+
+from conexao import conectar
+
+def consultar_produto(id):
+
+    banco = conectar()
+    cursor = banco.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT * FROM produtos WHERE id = %s",
+            (id,)
+        )
+
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        banco.close()

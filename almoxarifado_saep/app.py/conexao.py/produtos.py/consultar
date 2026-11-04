@@ -1,0 +1,18 @@
+from conexao import conectar
+
+def consultar_produto(id):
+
+    banco = conectar()
+    cursor = banco.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            "SELECT * FROM produtos WHERE id = %s",
+            (id,)
+        )
+
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        banco.close()

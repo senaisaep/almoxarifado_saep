@@ -1,0 +1,150 @@
+from flask import Flask, request, session, redirect, render_template, flash
+
+from usuarios import autenticar_usuario
+from produtos import (
+    cadastrar_produto,
+    consultar_produto,
+    atualizar_produto,
+    excluir_produto,
+    listar_produtos
+)
+from movimentacoes import movimentar_estoque
+from seguranca import verificar_permissao
+
+app = Flask(__name__)
+app.secret_key = "troque_por_uma_chave_segura"
+
+
+@app.route("/")
+def inicio():
+    return redirect("/produtos")
+
+
+# LOGIN
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+        usuario = autenticar_usuario(
+            request.form["email"],
+            request.form["senha"]
+        )
+
+        if usuario:
+            session["usuario_id"] = usuario["id"]
+            session["perfil"] = usuario["perfil"]
+            session["nome"] = usuario["nome"]
+
+            return redirect("/produtos")
+
+        flash("E-mail ou senha incorretos.")
+
+    return render_template("login.html")
+
+
+# LISTAR PRODUTOS
+@app.route("/produtos")
+@verificar_permissao("Administrador", "Operador")
+def produtos():
+
+    lista = listar_produtos(
+        nome=request.args.get("nome", ""),
+        data=request.args.get("data", ""),
+        pagina=request.args.get("pagina", 1, type=int)
+    )
+
+    return render_template(
+        "produtos.html",
+        produtos=lista
+    )
+
+
+# CADASTRAR PRODUTO
+@app.route("/cadastrar", methods=["POST"])
+@verificar_permissao("Administrador", "Operador")
+def cadastrar():
+
+    try:
+        cadastrar_produto(
+            request.form["nome"],
+            request.form["descricao"],
+            float(request.form["preco"]),
+            int(request.form["quantidade"])
+        )
+
+        flash("Produto cadastrado com sucesso!")
+
+    except ValueError as erro:
+        flash(str(erro))
+
+    return redirect("/produtos")
+
+
+# ATUALIZAR PRODUTO
+@app.route("/atualizar/<int:id>", methods=["POST"])
+@verificar_permissao("Administrador", "Operador")
+def atualizar(id):
+
+    try:
+        atualizar_produto(
+            id,
+            request.form["nome"],
+            request.form["descricao"],
+            float(request.form["preco"])
+        )
+
+        flash("Produto atualizado!")
+
+    except ValueError as erro:
+        flash(str(erro))
+
+    return redirect("/produtos")
+
+
+# EXCLUIR PRODUTO
+@app.route("/excluir/<int:id>", methods=["POST"])
+@verificar_permissao("Administrador")
+def excluir(id):
+
+    try:
+        excluir_produto(id)
+        flash("Produto excluído!")
+
+    except ValueError as erro:
+        flash(str(erro))
+
+    return redirect("/produtos")
+
+
+# ENTRADA E SAÍDA
+@app.route("/movimentar", methods=["POST"])
+@verificar_permissao("Administrador", "Operador")
+def movimentar():
+
+    try:
+        saldo = movimentar_estoque(
+            int(request.form["produto_id"]),
+            request.form["tipo"],
+            int(request.form["quantidade"]),
+            session["usuario_id"]
+        )
+
+        flash(f"Movimentação realizada! Saldo atual: {saldo}")
+
+    except ValueError as erro:
+        flash(str(erro))
+
+    return redirect("/produtos")
+
+
+# SAIR
+@app.route("/sair")
+def sair():
+
+    session.clear()
+
+    return redirect("/login")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

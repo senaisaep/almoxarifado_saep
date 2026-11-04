@@ -1,0 +1,21 @@
+from conexao import conectar
+def listar_produtos(nome="", pagina=1):
+    limite = 10 
+    inicio = (pagina - 1) * limite
+
+    banco = conectar()
+    cursor = banco.cursor(dictionary=True)
+    try: 
+        sql ="""
+        SELECT * FROM produtos 
+        WHERE nome LIKE  %s
+        """
+         parametros = [f"%{nome}%"]
+         if data: 
+            sql += "AND DATE(data cadastro) = %s"
+            parametros.extend([limite, inicio])
+            cursor.execute(sql, tuple(parametros))
+            return cursor.fetchall()
+    finally: 
+        cursor.close()
+        banco.close        

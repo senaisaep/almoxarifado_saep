@@ -1,0 +1,13 @@
+ALTER TABLE movimentacoes
+MODIFY tipo ENUM('entrada', 'saida')
+NOT NULL DEFAULT 'entrada';
+
+ALTER TABLE movimentacoes
+ADD COLUMN usuario_id INT NULL,
+ADD COLUMN data_hora DATETIME NOT NULL
+DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE movimentacoes
+ADD CONSTRAINT fk_movimentacoes_usuarios
+FOREIGN KEY (usuario_id)
+REFERENCES usuarios(id);
