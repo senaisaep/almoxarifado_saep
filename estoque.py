@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from src.config.db import conectar
+from db import conectar
 
 estoque = Blueprint("estoque", __name__)
 
