@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block auth_content %}
+<div class="login-page">
+  <div class="login-decoration"><div class="login-brand"><span class="brand-mark">A</span> Almoxarifado <b>SAEP</b></div>
+    <div class="login-message"><span class="eyebrow light">GESTÃO INTELIGENTE</span><h1>Seu estoque,<br>sempre em <em>ordem.</em></h1><p>Controle de materiais simples, organizado e seguro para o dia a dia da sua equipe.</p>
+      <div class="login-points"><span>✓ Controle de entradas e saídas</span><span>✓ Histórico de movimentações</span><span>✓ Acesso por perfil de usuário</span></div></div>
+    <div class="login-copy">SENAI • Pelo futuro do trabalho</div>
+  </div>
+  <div class="login-form-area"><form class="login-card" method="post">
+    <div class="form-icon">↗</div><span class="eyebrow">BEM-VINDO DE VOLTA</span><h2>Acesse sua conta</h2><p class="muted">Informe seus dados para continuar.</p>
+    <label>E-mail</label><input type="email" name="email" placeholder="seu.email@empresa.com" required autofocus>
+    <label>Senha</label><input type="password" name="senha" placeholder="Digite sua senha" required>
+    <button class="btn primary full" type="submit">Entrar no sistema <span>→</span></button>
+    <small class="login-foot">Acesso restrito a usuários autorizados.</small>
+  </form></div>
+</div>
+{% endblock %}

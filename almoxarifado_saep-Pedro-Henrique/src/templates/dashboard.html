@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Visão geral{% endblock %}{% block page_title %}Visão geral{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><h2>Olá, {{ session.usuario.nome.split(' ')[0] }}! 👋</h2><p>Acompanhe o que está acontecendo no seu almoxarifado.</p></div><a class="btn primary" href="{{ url_for('estoque.movimentacoes') }}">＋ Nova movimentação</a></div>
+<div class="stats-grid">
+  <article class="stat-card"><div class="stat-top"><span>Produtos cadastrados</span><span class="stat-icon purple">▤</span></div><strong>{{ resumo.total }}</strong><small>Itens diferentes no catálogo</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Unidades em estoque</span><span class="stat-icon blue">▦</span></div><strong>{{ resumo.unidades }}</strong><small>Quantidade total disponível</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Atenção ao estoque</span><span class="stat-icon orange">!</span></div><strong>{{ resumo.baixo }}</strong><small>Produtos com 5 unidades ou menos</small></article>
+</div>
+<div class="section-heading"><div><h3>Atividade recente</h3><p>Últimas movimentações registradas no sistema.</p></div><a class="text-link" href="{{ url_for('estoque.movimentacoes') }}">Ver histórico →</a></div>
+<div class="table-card"><table><thead><tr><th>Produto</th><th>Movimentação</th><th>Quantidade</th><th>Responsável</th><th>Data e hora</th></tr></thead><tbody>
+{% for item in recentes %}<tr><td><strong>{{ item.produto }}</strong></td><td><span class="pill {{ item.tipo }}">{{ item.tipo|capitalize }}</span></td><td>{{ item.quantidade }} un.</td><td>{{ item.usuario }}</td><td>{{ item.data_hora.strftime('%d/%m/%Y %H:%M') }}</td></tr>{% else %}<tr><td colspan="5" class="empty">Ainda não há movimentações registradas.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

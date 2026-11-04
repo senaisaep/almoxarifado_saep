@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}{{ 'Editar produto' if produto else 'Novo produto' }}{% endblock %}{% block page_title %}{{ 'Editar produto' if produto else 'Cadastrar produto' }}{% endblock %}
+{% block content %}<div class="form-card"><div class="form-heading"><h3>Dados do produto</h3><p>Preencha as informações para manter seu catálogo organizado.</p></div>
+<form method="post" class="data-form"><label>Nome do produto *</label><input name="nome" required maxlength="120" value="{{ produto.nome if produto else '' }}" placeholder="Ex.: Detergente neutro 500ml">
+<label>Descrição</label><textarea name="descricao" rows="3" placeholder="Informações adicionais sobre o produto">{{ produto.descricao if produto else '' }}</textarea>
+<div><label>Preço unitário (R$)</label><input type="number" name="preco" min="0" step="0.01" required value="{{ produto.preco if produto else '0.00' }}"></div>
+{% if not produto %}<p class="form-note">O produto será cadastrado com estoque zerado. Registre a quantidade inicial em Movimentações para manter o histórico correto.</p>{% endif %}
+<div class="form-actions"><a class="btn light" href="{{ url_for('produtos.listar') }}">Cancelar</a><button class="btn primary" type="submit">Salvar produto</button></div></form></div>{% endblock %}
