@@ -8,3 +8,6 @@ __pycache__/
 .vscode/
 dist/
 build/
+*.log
+.coverage
+htmlcov/

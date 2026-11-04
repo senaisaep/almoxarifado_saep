@@ -1,56 +1,65 @@
-# Sistema de Almoxarifado - Projeto inicial SAEP
+# Sistema de Almoxarifado - SAEP (v1.0.0)
 
-## Tecnologias
-Python, Flask e MySQL.
+API em **Python, Flask e MySQL** com camadas (rota → serviço → repositório), usuários com perfis,
+autenticação JWT e controle de estoque com entrada e saída.
 
-## Banco de dados
-Execute `infra/bd.sql` no MySQL Workbench. O script cria o banco `almoxarifado_saep`, as tabelas e registros iniciais.
+## Documentação
+- [Arquitetura](docs/ARQUITETURA.md) · [Versionamento](docs/VERSIONAMENTO.md)
+- [Usuários, perfis e segurança](docs/SEGURANCA.md) · [Plano de testes](docs/PLANO_DE_TESTES.md)
 
 ## Instalação
 ```bash
 python -m venv .venv
 ```
-Windows: `.venv\\Scripts\\activate`
-Linux/macOS: `source .venv/bin/activate`
-
+Windows: `.venv\Scripts\activate` · Linux/macOS: `source .venv/bin/activate`
 ```bash
 pip install -r requirements.txt
 ```
+1. Copie `.env.example` para `.env`; informe os dados do MySQL e gere a `SECRET_KEY`:
+   `python -c "import secrets; print(secrets.token_urlsafe(48))"`
+2. **Banco novo:** execute `infra/bd.sql` no MySQL Workbench.
+   **Banco da v0.1.0 com dados:** execute `infra/migracao_001_usuarios_saida.sql` (uma vez).
+3. Crie o primeiro administrador: `python -m src.scripts.criar_admin`
 
-Copie `.env.example` para `.env` e informe os dados de conexão com o MySQL.
-
-## Execução
+## Execução e testes
 ```bash
-python -m src.server
+python -m src.server     # http://127.0.0.1:5000
+pytest                   # não precisa de MySQL
 ```
-API: `http://127.0.0.1:5000`
 
-## Endpoints existentes
+## Uso rápido
+```bash
+# login
+curl -X POST localhost:5000/auth/login -H "Content-Type: application/json" \
+     -d '{"email":"admin@exemplo.com","senha":"SuaSenha123"}'
+# use o token retornado:
+curl -X POST localhost:5000/movimentacoes/saida -H "Authorization: Bearer <token>" \
+     -H "Content-Type: application/json" -d '{"produto_id":1,"quantidade":5}'
+```
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/produtos` | Lista todos, sem paginação/filtros |
-| GET | `/produtos/<id>` | Consulta produto por ID |
-| POST | `/produtos` | Cadastra produto |
-| PUT | `/produtos/<id>` | Atualiza produto |
-| DELETE | `/produtos/<id>` | Remove produto |
-| GET | `/movimentacoes` | Lista movimentações |
-| POST | `/movimentacoes/entrada` | Registra entrada |
-
-Exemplo de produto:
+### Saída de estoque
+- `quantidade <= saldo` → **201**, saldo atualizado, movimentação com `data_hora` e `responsavel`.
+- `quantidade > saldo` → **422**, nada é gravado:
 ```json
-{"nome":"Detergente neutro","descricao":"Limpeza geral","preco":3.50,"quantidade_estoque":20}
+{"mensagem":"Saída não permitida: estoque insuficiente. Disponível: 10, solicitado: 15.",
+ "disponivel":10,"solicitado":15}
 ```
 
-Exemplo de entrada:
-```json
-{"produto_id":1,"quantidade":10}
-```
+## Perfis
+| Perfil | Pode |
+|---|---|
+| `admin` | Tudo (inclui usuários e exclusão de produtos) |
+| `almoxarife` | Ver, cadastrar/editar produtos, registrar entradas e saídas |
+| `consulta` | Somente leitura |
 
-## Limitações do projeto inicial
-- Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
-- Não possui paginação nem filtros na listagem de produtos.
-- As movimentações não armazenam data/hora nem usuário responsável.
-- Somente a entrada de estoque está implementada; saída não está implementada.
-- A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.
-- O estudante deverá reorganizar o código em camadas e implementar os requisitos da avaliação.
+## Endpoints
+Lista completa com perfis e parâmetros em [docs/ARQUITETURA.md](docs/ARQUITETURA.md#endpoints).
+Resumo: `/auth/*`, `/usuarios`, `/produtos` (paginado, filtros `busca` e `estoque_max`),
+`/movimentacoes` (filtros `tipo`, `produto_id`, `data_inicio`, `data_fim`),
+`/movimentacoes/entrada`, `/movimentacoes/saida`.
+
+## Mudanças em relação à v0.1.0 (quebram compatibilidade)
+- Todas as rotas (exceto `/` e `/auth/login`) exigem `Authorization: Bearer <token>`.
+- `GET /produtos` agora retorna `{"dados": [...], "pagina", "por_pagina", "total", "total_paginas"}`.
+- `PUT /produtos/<id>` não altera mais `quantidade_estoque` (use entrada/saída).
+- Movimentações guardam `data_hora` e responsável; `tipo` aceita `saida`.
