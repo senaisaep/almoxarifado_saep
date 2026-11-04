@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresa de limpeza [ALMOXARIFADO]</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/static.css')}}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Acessar Conta</h1>
+            <p>Entre com suas credenciais para continuar</p>
+        </div>
+
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="login">Login</label>
+                <input type="text" id="login" name="login" placeholder="Digite seu usuário ou e-mail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember">
+                    Lembrar-me
+                </label>
+                <a href="#" class="forgot-password">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Acessar</button>
+        </form>
+
+        <div class="login-footer">
+            <p>Não tem uma conta? <a href="#">Cadastre-se</a></p>
+        </div>
+    </div>
+</body>
+</html>
