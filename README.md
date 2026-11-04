@@ -1,56 +1,73 @@
-# Sistema de Almoxarifado - Projeto inicial SAEP
+# SIMULADO SAEP — API de Almoxarifado
 
-## Tecnologias
-Python, Flask e MySQL.
+## Como começar
 
-## Banco de dados
-Execute `infra/bd.sql` no MySQL Workbench. O script cria o banco `almoxarifado_saep`, as tabelas e registros iniciais.
+### 1. Instale o ambiente virtual
 
-## Instalação
-```bash
-python -m venv .venv
 ```
-Windows: `.venv\\Scripts\\activate`
-Linux/macOS: `source .venv/bin/activate`
+python -m venv venv
+```
 
-```bash
+### 2. Ative o ambiente virtual
+
+```
+source venv\Scripts\activate
+```
+
+### 3. Instale as dependências
+
+```
 pip install -r requirements.txt
 ```
 
-Copie `.env.example` para `.env` e informe os dados de conexão com o MySQL.
+### 4. Rode o servidor
 
-## Execução
-```bash
-python -m src.server
 ```
-API: `http://127.0.0.1:5000`
-
-## Endpoints existentes
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/produtos` | Lista todos, sem paginação/filtros |
-| GET | `/produtos/<id>` | Consulta produto por ID |
-| POST | `/produtos` | Cadastra produto |
-| PUT | `/produtos/<id>` | Atualiza produto |
-| DELETE | `/produtos/<id>` | Remove produto |
-| GET | `/movimentacoes` | Lista movimentações |
-| POST | `/movimentacoes/entrada` | Registra entrada |
-
-Exemplo de produto:
-```json
-{"nome":"Detergente neutro","descricao":"Limpeza geral","preco":3.50,"quantidade_estoque":20}
+uvicorn main:app --reload
 ```
 
-Exemplo de entrada:
-```json
-{"produto_id":1,"quantidade":10}
-```
+### 5. Acesse o Swagger
 
-## Limitações do projeto inicial
-- Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
-- Não possui paginação nem filtros na listagem de produtos.
-- As movimentações não armazenam data/hora nem usuário responsável.
-- Somente a entrada de estoque está implementada; saída não está implementada.
-- A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.
-- O estudante deverá reorganizar o código em camadas e implementar os requisitos da avaliação.
+## http://127.0.0.1:8000/docs
+
+### Leia o enunciado completo antes de começar!
+
+O arquivo do enunciado contém todas as instruções, tabelas, rotas e o checklist de testes.
+
+<-----------------------------------------------------------------------------------------> 
+Clone o repositório:
+git clone https://github.com/MMVonnSeek/senai-simulado-saep.git
+
+
+==========================================================================================
+-- Leia o enunciado anexado --
+==========================================================================================
+
+
+CONFIGURAÇÃO DE AMBIENTE
+Instale a venv:
+python -m venv venv
+
+Ative a venv:
+source venv/Scripts/activate
+
+Com o venv ativo instale as dependências: 
+python -m pip install fastapi uvicorn sqlalchemy python-dotenv email-validator
+
+Instale o requirements.txt 
+python -m pip freeze > requirements.txt  
+
+Habilite o servidor
+uvicorn main:app --reload
+
+
+SUBIR PROJETO PARA O GITHUB
+⚠️Antes de executar os comando abaixo verifique se o terminal está na pasta principal do projeto.
+
+git init
+
+git add .
+
+git commit -m "COMENTÁRIO DESCRITIVO"
+
+git push origin main
