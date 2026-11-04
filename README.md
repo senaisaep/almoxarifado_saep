@@ -36,6 +36,7 @@ API: `http://127.0.0.1:5000`
 | DELETE | `/produtos/<id>` | Remove produto |
 | GET | `/movimentacoes` | Lista movimentações |
 | POST | `/movimentacoes/entrada` | Registra entrada |
+| POST | `/movimentacoes/saida` | Registra saída com validação de estoque |
 
 Exemplo de produto:
 ```json
@@ -44,13 +45,22 @@ Exemplo de produto:
 
 Exemplo de entrada:
 ```json
-{"produto_id":1,"quantidade":10}
+{"produto_id":1,"quantidade":10,"responsavel":"João"}
+```
+
+Exemplo de saída válida:
+```json
+{"produto_id":1,"quantidade":5,"responsavel":"Maria"}
+```
+
+Exemplo de saída bloqueada:
+```json
+{"produto_id":1,"quantidade":999,"responsavel":"Maria"}
 ```
 
 ## Limitações do projeto inicial
 - Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
 - Não possui paginação nem filtros na listagem de produtos.
-- As movimentações não armazenam data/hora nem usuário responsável.
-- Somente a entrada de estoque está implementada; saída não está implementada.
-- A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.
-- O estudante deverá reorganizar o código em camadas e implementar os requisitos da avaliação.
+- As movimentações registram data/hora e responsável da operação.
+- A saída de estoque foi implementada com validação de saldo disponível.
+- O código foi reorganizado em camadas para facilitar manutenção.

@@ -1,5 +1,5 @@
 -- Estado inicial do banco entregue pelo aplicador.
--- Não inclui usuários/perfis, data/hora ou responsável pela movimentação.
+-- Mantém a estrutura de produtos e registra a data/hora e o responsável em cada movimentação.
 
 CREATE DATABASE IF NOT EXISTS almoxarifado_saep
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -20,8 +20,10 @@ CREATE TABLE produtos (
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    tipo ENUM('entrada', 'saida') NOT NULL DEFAULT 'entrada',
     quantidade INT NOT NULL,
+    responsavel VARCHAR(120) NOT NULL DEFAULT 'Sistema',
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_movimentacoes_produtos
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
@@ -36,7 +38,7 @@ INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
 ('Pano de chão', 'Pano de algodão', 6.00, 22),
 ('Álcool 70% 1L', 'Álcool para limpeza', 9.90, 12);
 
-INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES
-(1, 'entrada', 40), (2, 'entrada', 25), (3, 'entrada', 30),
-(4, 'entrada', 18), (5, 'entrada', 60), (6, 'entrada', 15),
-(7, 'entrada', 22), (8, 'entrada', 12);
+INSERT INTO movimentacoes (produto_id, tipo, quantidade, responsavel, data_hora) VALUES
+(1, 'entrada', 40, 'Sistema', NOW()), (2, 'entrada', 25, 'Sistema', NOW()), (3, 'entrada', 30, 'Sistema', NOW()),
+(4, 'entrada', 18, 'Sistema', NOW()), (5, 'entrada', 60, 'Sistema', NOW()), (6, 'entrada', 15, 'Sistema', NOW()),
+(7, 'entrada', 22, 'Sistema', NOW()), (8, 'entrada', 12, 'Sistema', NOW());
