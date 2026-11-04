@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estoque - Almoxarifado</title>
+    <style>
+        body { font: 15px Arial, sans-serif; margin: 24px auto; max-width: 1100px; padding: 0 16px; color: #222; }
+        header, section { margin-bottom: 24px; }
+        header { display: flex; justify-content: space-between; align-items: center; }
+        input, select, button { padding: 8px; margin: 4px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border-bottom: 1px solid #ddd; padding: 9px; text-align: left; }
+        .forms { display: flex; flex-wrap: wrap; gap: 24px; }
+        .forms form { border: 1px solid #ddd; padding: 12px; }
+        #mensagem { min-height: 1.4em; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Estoque</h1>
+            <p>{{ nome }} — {{ perfil }}</p>
+        </div>
+        <form id="sair"><button type="submit">Sair</button></form>
+    </header>
+
+    <p id="mensagem" role="status"></p>
+
+    {% if perfil == "Administrador" %}
+    <section>
+        <h2>Cadastrar produto</h2>
+        <form id="novo-produto">
+            <input name="nome" placeholder="Nome" required>
+            <input name="descricao" placeholder="Descrição">
+            <input name="preco" type="number" min="0" step="0.01" value="0" required>
+            <input name="quantidade_estoque" type="number" min="0" step="1" value="0" required>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <section>
+        <h2>Produtos</h2>
+        {% include "produtos.html" %}
+    </section>
+
+    <section class="forms">
+        <div>
+            <h2>Movimentar estoque</h2>
+            <form id="movimentacao">
+                <select name="produto_id" required>
+                    <option value="">Selecione um produto</option>
+                    {% for produto in produtos %}
+                    <option value="{{ produto.id }}">{{ produto.nome }}</option>
+                    {% endfor %}
+                </select>
+                <input name="quantidade" type="number" min="1" step="1" placeholder="Quantidade" required>
+                <select name="tipo">
+                    <option value="entrada">Entrada</option>
+                    <option value="saida">Saída</option>
+                </select>
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
+
+        {% if perfil == "Administrador" %}
+        <div>
+            <h2>Cadastrar usuário</h2>
+            <form id="novo-usuario">
+                <input name="nome" placeholder="Nome" required>
+                <input name="login" placeholder="Login" required>
+                <input name="senha" type="password" minlength="8" placeholder="Senha (mínimo 8 caracteres)" required>
+                <select name="perfil">
+                    <option>Operador</option>
+                    <option>Administrador</option>
+                </select>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </div>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Movimentações recentes</h2>
+        <table>
+            <thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Quantidade</th><th>Responsável</th></tr></thead>
+            <tbody>
+                {% for movimento in movimentacoes %}
+                <tr>
+                    <td>{{ movimento.data_hora }}</td>
+                    <td>{{ movimento.produto }}</td>
+                    <td>{{ movimento.tipo }}</td>
+                    <td>{{ movimento.quantidade }}</td>
+                    <td>{{ movimento.responsavel }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">Nenhuma movimentação registrada.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        const mensagem = document.getElementById("mensagem");
+
+        async function enviar(url, metodo, dados) {
+            const resposta = await fetch(url, {
+                method: metodo,
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(dados)
+            });
+            const resultado = await resposta.json();
+            if (!resposta.ok) throw new Error(resultado.mensagem || "Não foi possível concluir a operação.");
+            return resultado;
+        }
+
+        document.getElementById("sair").addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            await fetch("/logout", {method: "POST"});
+            location.href = "/login";
+        });
+
+        document.getElementById("movimentacao").addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            const campos = Object.fromEntries(new FormData(evento.target));
+            const tipo = campos.tipo;
+            try {
+                await enviar(`/movimentacoes/${tipo}`, "POST", {
+                    produto_id: Number(campos.produto_id),
+                    quantidade: Number(campos.quantidade)
+                });
+                location.reload();
+            } catch (erro) { mensagem.textContent = erro.message; }
+        });
+
+        const novoProduto = document.getElementById("novo-produto");
+        if (novoProduto) novoProduto.addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            const campos = Object.fromEntries(new FormData(evento.target));
+            try {
+                await enviar("/produtos", "POST", {
+                    nome: campos.nome,
+                    descricao: campos.descricao,
+                    preco: Number(campos.preco),
+                    quantidade_estoque: Number(campos.quantidade_estoque)
+                });
+                location.reload();
+            } catch (erro) { mensagem.textContent = erro.message; }
+        });
+
+        document.querySelectorAll(".editar-produto").forEach((formulario) => {
+            formulario.addEventListener("submit", async (evento) => {
+                evento.preventDefault();
+                const campos = Object.fromEntries(new FormData(formulario));
+                try {
+                    await enviar(`/produtos/${formulario.dataset.id}`, "PUT", {
+                        nome: campos.nome,
+                        descricao: campos.descricao,
+                        preco: Number(campos.preco)
+                    });
+                    location.reload();
+                } catch (erro) { mensagem.textContent = erro.message; }
+            });
+        });
+
+        document.querySelectorAll(".remover-produto").forEach((botao) => {
+            botao.addEventListener("click", async () => {
+                try {
+                    await enviar(`/produtos/${botao.dataset.id}`, "DELETE");
+                    location.reload();
+                } catch (erro) { mensagem.textContent = erro.message; }
+            });
+        });
+
+        const novoUsuario = document.getElementById("novo-usuario");
+        if (novoUsuario) novoUsuario.addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            const campos = Object.fromEntries(new FormData(evento.target));
+            try {
+                await enviar("/usuarios", "POST", campos);
+                mensagem.textContent = "Usuário cadastrado.";
+                evento.target.reset();
+            } catch (erro) { mensagem.textContent = erro.message; }
+        });
+    </script>
+</body>
+</html>

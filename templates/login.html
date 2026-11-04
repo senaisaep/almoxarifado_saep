@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Almoxarifado</title>
+    <style>
+        body { font: 16px Arial, sans-serif; background: #f2f4f7; margin: 0; }
+        main { max-width: 360px; margin: 12vh auto; padding: 28px; background: white; border-radius: 8px; }
+        label, input, button { display: block; width: 100%; box-sizing: border-box; }
+        input, button { padding: 10px; margin: 8px 0 16px; }
+        button { cursor: pointer; }
+        .erro { color: #b42318; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Almoxarifado</h1>
+        {% if erro %}<p class="erro">{{ erro }}</p>{% endif %}
+        <form action="/login" method="post">
+            <label for="login">Login</label>
+            <input id="login" name="login" required autofocus>
+            <label for="senha">Senha</label>
+            <input id="senha" name="senha" type="password" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </main>
+</body>
+</html>

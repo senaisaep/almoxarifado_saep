@@ -1,56 +1,43 @@
-# Sistema de Almoxarifado - Projeto inicial SAEP
+# Almoxarifado
 
-## Tecnologias
-Python, Flask e MySQL.
+Aplicação local para controlar usuários, produtos e movimentações de estoque.
+Todos os dados ficam em `almoxarifado.db`, criado automaticamente; não precisa
+de MySQL nem de configurar um arquivo `.env`.
+Na primeira inicialização, o sistema também cadastra os oito produtos iniciais
+com seus saldos antigos, sem duplicá-los nem sobrescrever alterações futuras.
 
-## Banco de dados
-Execute `infra/bd.sql` no MySQL Workbench. O script cria o banco `almoxarifado_saep`, as tabelas e registros iniciais.
+## Iniciar
 
-## Instalação
-```bash
-python -m venv .venv
-```
-Windows: `.venv\\Scripts\\activate`
-Linux/macOS: `source .venv/bin/activate`
-
-```bash
-pip install -r requirements.txt
+```powershell
+python -m pip install -r requirements.txt
+python app.py
 ```
 
-Copie `.env.example` para `.env` e informe os dados de conexão com o MySQL.
+Abra <http://127.0.0.1:5000> e entre com uma das contas iniciais:
 
-## Execução
-```bash
-python -m src.server
-```
-API: `http://127.0.0.1:5000`
-
-## Endpoints existentes
-
-| Método | Endpoint | Descrição |
+| Perfil | Login | Senha |
 |---|---|---|
-| GET | `/produtos` | Lista todos, sem paginação/filtros |
-| GET | `/produtos/<id>` | Consulta produto por ID |
-| POST | `/produtos` | Cadastra produto |
-| PUT | `/produtos/<id>` | Atualiza produto |
-| DELETE | `/produtos/<id>` | Remove produto |
-| GET | `/movimentacoes` | Lista movimentações |
-| POST | `/movimentacoes/entrada` | Registra entrada |
+| Administrador | `admin` | `123` |
+| Operador | `operador` | `456` |
 
-Exemplo de produto:
-```json
-{"nome":"Detergente neutro","descricao":"Limpeza geral","preco":3.50,"quantidade_estoque":20}
+O administrador pode cadastrar usuários, produtos e movimentar o estoque.
+Operadores podem consultar produtos e registrar entradas e saídas. O saldo
+inicial de um produto também é registrado como uma entrada.
+
+As senhas são armazenadas como hashes no SQLite. Altere as senhas padrão antes
+de disponibilizar o sistema a outras pessoas.
+
+## Testes
+
+```powershell
+python -m unittest discover -s tests -v
 ```
 
-Exemplo de entrada:
-```json
-{"produto_id":1,"quantidade":10}
-```
+## Estrutura
 
-## Limitações do projeto inicial
-- Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
-- Não possui paginação nem filtros na listagem de produtos.
-- As movimentações não armazenam data/hora nem usuário responsável.
-- Somente a entrada de estoque está implementada; saída não está implementada.
-- A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.
-- O estudante deverá reorganizar o código em camadas e implementar os requisitos da avaliação.
+- `app.py`: inicializa e executa o Flask.
+- `infra/database.py`: cria e conecta ao banco SQLite local.
+- `controllers/`: rotas HTTP.
+- `repositories/`: consultas e transações do banco.
+- `services/`: validações e regras de negócio.
+- `templates/`: páginas do sistema.
