@@ -54,3 +54,4 @@ Exemplo de entrada:
 - Somente a entrada de estoque está implementada; saída não está implementada.
 - A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.
 - O estudante deverá reorganizar o código em camadas e implementar os requisitos da avaliação.
+ 

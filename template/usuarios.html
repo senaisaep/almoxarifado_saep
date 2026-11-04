@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h1>Gerenciamento de Usuários</h1>
+
+<h2>Cadastrar usuário</h2>
+
+<p>Nome: <input type="text"></p>
+
+<p>Email: <input type="email"></p>
+
+<p>Senha: <input type="password"></p>
+
+<p>Tipo de usuário:</p>
+
+<select>
+    <option>Administrador</option>
+    <option>Operador</option>
+</select>
+
+<p><button>Cadastrar usuário</button></p>
+
+<h2>Usuários cadastrados</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Tipo</th>
+    </tr>
+</table>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h1>Movimentações de Estoque</h1>
+
+<h2>Registrar movimentação</h2>
+
+<p>Produto: <input type="text"></p>
+
+<p>Tipo de movimentação:</p>
+<p>Entrada ou Saída</p>
+
+<select>
+    <option>Entrada</option>
+    <option>Saída</option>
+</select>
+
+<p>Quantidade: <input type="number"></p>
+
+<p><button>Registrar movimentação</button></p>
+
+<h2>Histórico de movimentações</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Produto</th>
+        <th>Tipo</th>
+        <th>Quantidade</th>
+        <th>Responsável</th>
+        <th>Data e hora</th>
+    </tr>
+</table>
+
+{% endblock %}

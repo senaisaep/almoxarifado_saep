@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block conteudo %}
+
+<h1>Produtos</h1>
+
+<h2>Pesquisar produtos</h2>
+
+<p>Nome: <input type="text"></p>
+<p>Data de cadastro: <input type="date"></p>
+
+<p><button>Pesquisar</button></p>
+
+<h2>Lista de produtos</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Preço</th>
+        <th>Quantidade</th>
+        <th>Data de cadastro</th>
+    </tr>
+</table>
+
+<p><a href="/novo-produto">Cadastrar novo produto</a></p>
+
+{% endblock %}
