@@ -1,10 +1,22 @@
-.env
-.venv/
-venv/
+**/__pycache__/
+# Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.idea/
+.venv/
+venv/
+
+# Banco de dados SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# IDE
 .vscode/
-dist/
-build/
+.idea/
+
+# Sistema
+.DS_Store

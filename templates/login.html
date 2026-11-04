@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockFlow | Login</title>
+
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+   
+</head>
+
+<body>
+
+    <main class="register-container">
+
+        <div class="register-card login-card">
+
+            <div class="login-icon">📦</div>
+
+            <h2 class="logo">Stock<span>Flow.</span></h2>
+
+            <h1>Bem-vindo de volta!</h1>
+
+            <p class="subtitle">
+                Entre com suas credenciais para acessar o almoxarifado.
+            </p>
+
+            {% if erro %}
+                <div class="alert error">
+                    {{ erro }}
+                </div>
+            {% endif %}
+
+            <form action="/login" method="POST">
+
+                <div class="input-group">
+                    <label for="login">Usuário</label>
+
+                    <input
+                        type="text"
+                        id="login"
+                        name="login"
+                        placeholder="Digite seu login"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="senha">Senha</label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary full-width">
+                    Entrar no sistema →
+                </button>
+
+            </form>
+
+            <div class="login-footer">
+                <span>StockFlow © 2026</span>
+                <span>Sistema de Gestão de Estoque</span>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
