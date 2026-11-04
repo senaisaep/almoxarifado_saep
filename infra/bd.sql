@@ -7,6 +7,7 @@ USE almoxarifado_saep;
 
 DROP TABLE IF EXISTS movimentacoes;
 DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS usuarios;
 
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,6 +16,14 @@ CREATE TABLE produtos (
     preco DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     quantidade_estoque INT NOT NULL DEFAULT 0,
     data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    
+);
+
+
+CREATE TABLE usuarios(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    cargo VARCHAR(150) NOT NULL
 );
 
 CREATE TABLE movimentacoes (
@@ -22,6 +31,8 @@ CREATE TABLE movimentacoes (
     produto_id INT NOT NULL,
     tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
     quantidade INT NOT NULL,
+    data_saida DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+    responsavel_saida VARCHAR(150) NOT NULL
     CONSTRAINT fk_movimentacoes_produtos
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
@@ -36,7 +47,12 @@ INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
 ('Pano de chão', 'Pano de algodão', 6.00, 22),
 ('Álcool 70% 1L', 'Álcool para limpeza', 9.90, 12);
 
-INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES
+INSERT INTO movimentacoes (produto_id, tipo) VALUES
 (1, 'entrada', 40), (2, 'entrada', 25), (3, 'entrada', 30),
 (4, 'entrada', 18), (5, 'entrada', 60), (6, 'entrada', 15),
 (7, 'entrada', 22), (8, 'entrada', 12);
+
+INSERT INTO usuarios (nome, cargo) VALUES
+( 'Maria', 'Administrador do sitema'),
+('João', 'Operador de Almoxarifado');
+
