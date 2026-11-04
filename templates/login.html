@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Almoxarifado</title>
+</head>
+<body>
+    <header>
+        <h1>Almoxarifado</h1>
+        <h2>Login</h2>
+    </header>
+    <main>
+        <p>Informe seu usuário e senha para entrar no sistema.</p>
+        {% if mensagem %}<p role="alert">{{ mensagem }}</p>{% endif %}
+
+        <form method="POST" action="{{ url_for('auth.login_route') }}">
+            <fieldset>
+                <legend>Acesso ao sistema</legend>
+                <p>
+                    <label for="username">Usuário (obrigatório)</label><br>
+                    <input type="text" id="username" name="username" autocomplete="username" required>
+                </p>
+                <p>
+                    <label for="senha">Senha (obrigatória)</label><br>
+                    <input type="password" id="senha" name="senha" autocomplete="current-password" required>
+                </p>
+                <p><button type="submit">Entrar</button></p>
+            </fieldset>
+        </form>
+        <p><a href="{{ url_for('auth.cadastro') }}">Cadastrar usuário</a></p>
+    </main>
+</body>
+</html>

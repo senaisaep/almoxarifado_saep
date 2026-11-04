@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Almoxarifado</title>
+</head>
+<body>
+    <header>
+        <h1>Almoxarifado</h1>
+        <h2>Produtos</h2>
+    </header>
+    <main>
+        <p>Preencha o nome do produto. O campo é obrigatório.</p>
+        <form method="POST" action="{{ url_for('produtos.cadastrar_produto') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <fieldset>
+                <legend>Dados do produto</legend>
+                <p>
+                    <label for="nome">Nome do produto (obrigatório)</label><br>
+                    <input type="text" id="nome" name="nome" required>
+                </p>
+                <p><button type="submit">Adicionar produto</button></p>
+            </fieldset>
+        </form>
+        <p><a href="{{ url_for('auth.logout') }}">Sair</a></p>
+    </main>
+</body>
+</html>

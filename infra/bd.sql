@@ -1,5 +1,4 @@
--- Estado inicial do banco entregue pelo aplicador.
--- Não inclui usuários/perfis, data/hora ou responsável pela movimentação.
+
 
 CREATE DATABASE IF NOT EXISTS almoxarifado_saep
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -7,6 +6,14 @@ USE almoxarifado_saep;
 
 DROP TABLE IF EXISTS movimentacoes;
 DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS usuarios;
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    tipo ENUM('administrador', 'operador', 'consulta') NOT NULL DEFAULT 'consulta'
+);
 
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -20,14 +27,14 @@ CREATE TABLE produtos (
 CREATE TABLE movimentacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT NOT NULL,
-    tipo ENUM('entrada') NOT NULL DEFAULT 'entrada',
+    tipo ENUM('entrada', 'saida') NOT NULL DEFAULT 'entrada',
     quantidade INT NOT NULL,
     CONSTRAINT fk_movimentacoes_produtos
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
 
 INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
-('Detergente neutro 500ml', 'Detergente líquido para limpeza geral', 3.50, 40),
+('Detergente neutro 500ml', 'Detergente líquido para limpeza geral', 5.90, 25),
 ('Água sanitária 1L', 'Alvejante para limpeza', 5.90, 25),
 ('Desinfetante lavanda 2L', 'Desinfetante perfumado', 8.75, 30),
 ('Sabão em pó 1kg', 'Sabão em pó para lavagem', 12.90, 18),

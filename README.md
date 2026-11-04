@@ -47,9 +47,15 @@ Exemplo de entrada:
 {"produto_id":1,"quantidade":10}
 ```
 
-## Limitações do projeto inicial
-- Não possui cadastro/login de usuários, autenticação, autorização ou perfis.
-- Não possui paginação nem filtros na listagem de produtos.
+## Autenticação e perfis
+- Cadastro público em `GET/POST /cadastro`.
+- Login em `GET/POST /login` e logout em `GET/POST /logout`.
+- Perfis: `administrador`, `operador` e `consulta`.
+- Consulta pode visualizar; operador pode alterar dados; administrador pode excluir e cadastrar usuários.
+- As rotas da interface exigem sessão autenticada; formularios protegidos usam token CSRF.
+
+## Limitações restantes
+- Não possui paginação nem filtros na interface web.
 - As movimentações não armazenam data/hora nem usuário responsável.
 - Somente a entrada de estoque está implementada; saída não está implementada.
 - A lógica de negócio e os comandos SQL estão concentrados em `src/routes/estoque.py`.

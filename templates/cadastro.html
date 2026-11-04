@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Almoxarifado</title>
+</head>
+<body>
+    <header><h1>Almoxarifado</h1><h2>Cadastrar usuário</h2></header>
+    <main>
+      
+        <form method="POST" action="{{ url_for('auth.cadastro') }}">
+            <fieldset>
+                <legend>Novo usuário</legend>
+                <p><label for="username">Usuário</label><br><input id="username" name="username" autocomplete="username" required minlength="3"></p>
+                <p><label for="senha">Senha</label><br><input id="senha" type="password" name="senha" autocomplete="new-password" required minlength="8"></p>
+                <p><label for="tipo">Tipo</label><br>
+                    <select id="tipo" name="tipo">
+                        <option value="consulta">Consulta</option>
+                        <option value="operador">Operador</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </p>
+                <p><button type="submit">Cadastrar</button></p>
+            </fieldset>
+        </form>
+        <p><a href="{{ url_for('auth.login_route') }}">Voltar ao login</a></p>
+    </main>
+</body>
+</html>
