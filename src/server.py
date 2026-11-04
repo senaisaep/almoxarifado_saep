@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from src.routes.estoque import estoque
+from controllers.estoque import estoque
 import os
 from dotenv import load_dotenv
 
