@@ -1,0 +1,94 @@
+EVIDÊNCIA - CENÁRIO 4: Registro de data/hora e responsável na saída
+Executado em: 04/11/2026 09:52:34
+API: http://127.0.0.1:5000
+======================================================================
+
+[Passo 1] Login do operador
+
+>>> POST /auth/login
+    corpo: {"email": "operador@almoxarifado.com", "senha": "********"}
+<<< HTTP 200
+    {
+      "token": "<token omitido>",
+      "usuario": {
+        "id": 2,
+        "nome": "Operador",
+        "perfil": "operador"
+      }
+    }
+
+[Passo 2] Consulta do saldo ANTES da saída
+
+>>> GET /produtos/2
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Alvejante para limpeza",
+      "id": 2,
+      "nome": "Ãgua sanitÃ¡ria 1L",
+      "preco": 5.9,
+      "quantidade_estoque": 25
+    }
+
+[Passo 3] Solicitação de saída de 5 unidade(s)
+
+>>> POST /movimentacoes/saida
+    corpo: {"produto_id": 2, "quantidade": 5}
+    header: Authorization: Bearer <token>
+<<< HTTP 201
+    {
+      "estoque_atual": 20,
+      "mensagem": "Saída registrada com sucesso.",
+      "movimentacao_id": 11,
+      "produto_id": 2
+    }
+
+[Passo 4] Consulta do saldo DEPOIS da saída
+
+>>> GET /produtos/2
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Alvejante para limpeza",
+      "id": 2,
+      "nome": "Ãgua sanitÃ¡ria 1L",
+      "preco": 5.9,
+      "quantidade_estoque": 20
+    }
+
+[Passo 5] Consulta do histórico de saídas do produto
+
+>>> GET /movimentacoes?produto_id=2&tipo=saida
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "dados": [
+        {
+          "data_hora": "2026-11-04T09:52:35",
+          "id": 11,
+          "produto": "Ãgua sanitÃ¡ria 1L",
+          "produto_id": 2,
+          "quantidade": 5,
+          "tipo": "saida",
+          "usuario": "Operador",
+          "usuario_id": 2
+        }
+      ],
+      "limite": 10,
+      "pagina": 1,
+      "total": 1,
+      "total_paginas": 1
+    }
+
+======================================================================
+COMPARAÇÃO ESPERADO x OBTIDO
+  status: esperado=201 | obtido=201 -> OK
+  estoque_depois: esperado=20 | obtido=20 -> OK
+  novas_movimentacoes: esperado=1 | obtido=1 -> OK
+  tipo_ultima_movimentacao: esperado='saida' | obtido='saida' -> OK
+  usuario_ultima_saida: esperado='Operador' | obtido='Operador' -> OK
+  tem_data_hora: esperado=True | obtido=True -> OK
+
+RESULTADO DO TESTE: APROVADO

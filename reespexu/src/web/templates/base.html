@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Almoxarifado SAEP{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('web.static', filename='css/estilo.css') }}">
+</head>
+
+<body>
+  <header>
+    <h1>📦 Almoxarifado SAEP</h1>
+    <div id="cabecalhoUsuario"></div>
+  </header>
+
+
+  <script src="{{ url_for('web.static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+<main>
+  <section id="telaLogin">
+    <h2>Entrar</h2>
+
+    <label for="email">E-mail</label>
+    <input id="email" type="email" placeholder="admin@almoxarifado.com" autocomplete="username">
+
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" placeholder="••••••" autocomplete="current-password">
+
+    <button id="botaoEntrar">Entrar</button>
+    <div class="erro" id="erroLogin"></div>
+
+    <p class="dica">
+      Usuários de teste:<br>
+      <code>admin@almoxarifado.com</code> / <code>admin123</code><br>
+      <code>operador@almoxarifado.com</code> / <code>operador123</code>
+    </p>
+  </section>
+</main>
+
+<script>
+  if (localStorage.getItem("token")) {
+    window.location.href = "/app/produtos";
+  }
+  document.getElementById("botaoEntrar").addEventListener("click", entrar);
+  document.getElementById("senha").addEventListener("keyup", e => {
+    if (e.key === "Enter") entrar();
+  });
+</script>

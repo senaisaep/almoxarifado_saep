@@ -1,0 +1,92 @@
+EVIDÊNCIA - CENÁRIO 2: Saída com quantidade MENOR que o saldo disponível
+Executado em: 04/11/2026 09:52:33
+API: http://127.0.0.1:5000
+======================================================================
+
+[Passo 1] Login do operador
+
+>>> POST /auth/login
+    corpo: {"email": "operador@almoxarifado.com", "senha": "********"}
+<<< HTTP 200
+    {
+      "token": "<token omitido>",
+      "usuario": {
+        "id": 2,
+        "nome": "Operador",
+        "perfil": "operador"
+      }
+    }
+
+[Passo 2] Consulta do saldo ANTES da saída
+
+>>> GET /produtos/1
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Detergente lÃ­quido para limpeza geral",
+      "id": 1,
+      "nome": "Detergente neutro 500ml",
+      "preco": 3.5,
+      "quantidade_estoque": 40
+    }
+
+[Passo 3] Solicitação de saída de 10 unidade(s)
+
+>>> POST /movimentacoes/saida
+    corpo: {"produto_id": 1, "quantidade": 10}
+    header: Authorization: Bearer <token>
+<<< HTTP 201
+    {
+      "estoque_atual": 30,
+      "mensagem": "Saída registrada com sucesso.",
+      "movimentacao_id": 9,
+      "produto_id": 1
+    }
+
+[Passo 4] Consulta do saldo DEPOIS da saída
+
+>>> GET /produtos/1
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Detergente lÃ­quido para limpeza geral",
+      "id": 1,
+      "nome": "Detergente neutro 500ml",
+      "preco": 3.5,
+      "quantidade_estoque": 30
+    }
+
+[Passo 5] Consulta do histórico de saídas do produto
+
+>>> GET /movimentacoes?produto_id=1&tipo=saida
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "dados": [
+        {
+          "data_hora": "2026-11-04T09:52:34",
+          "id": 9,
+          "produto": "Detergente neutro 500ml",
+          "produto_id": 1,
+          "quantidade": 10,
+          "tipo": "saida",
+          "usuario": "Operador",
+          "usuario_id": 2
+        }
+      ],
+      "limite": 10,
+      "pagina": 1,
+      "total": 1,
+      "total_paginas": 1
+    }
+
+======================================================================
+COMPARAÇÃO ESPERADO x OBTIDO
+  status: esperado=201 | obtido=201 -> OK
+  estoque_antes: esperado=40 | obtido=40 -> OK
+  estoque_depois: esperado=30 | obtido=30 -> OK
+  novas_movimentacoes: esperado=1 | obtido=1 -> OK
+
+RESULTADO DO TESTE: APROVADO

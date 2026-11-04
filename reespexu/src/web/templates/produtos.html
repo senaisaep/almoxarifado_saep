@@ -1,0 +1,94 @@
+<main>
+ 
+  <section>
+    <h2>Produtos
+      <span class="direita">
+        <input id="filtroNome" placeholder="Filtrar por nome">
+        <button class="secundario" id="botaoBuscar">Buscar</button>
+      </span>
+    </h2>
+
+    <table id="tabelaProdutos">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th class="num">Preço</th>
+          <th class="num">Estoque</th>
+          <th>Cadastro</th>
+          <th class="acoes-th">Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="paginacao">
+      <button class="secundario" id="pagAnterior">◀ Anterior</button>
+      <span id="infoPagina">Página 1</span>
+      <button class="secundario" id="pagProxima">Próxima ▶</button>
+    </div>
+    <div class="erro" id="erroProdutos"></div>
+  </section>
+
+
+  <section>
+    <h2>Cadastrar produto</h2>
+    <div class="linha">
+      <div><label>Nome</label><input id="pNome"></div>
+      <div><label>Preço</label><input id="pPreco" type="number" step="0.01" min="0"></div>
+      <div><label>Quantidade</label><input id="pQtd" type="number" min="0"></div>
+    </div>
+    <label>Descrição</label><input id="pDesc">
+    <button id="botaoCadastrar">Cadastrar</button>
+    <div id="msgProduto"></div>
+  </section>
+
+  
+  <section>
+    <h2>Movimentar estoque</h2>
+    <div class="linha">
+      <div><label>ID do produto</label><input id="mProduto" type="number" min="1"></div>
+      <div><label>Quantidade</label><input id="mQtd" type="number" min="1"></div>
+      <div>
+        <label>Tipo</label>
+        <select id="mTipo">
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
+      </div>
+    </div>
+    <button id="botaoMovimentar">Registrar movimentação</button>
+    <div id="msgMovimento"></div>
+  </section>
+
+  
+  <section>
+    <h2>Últimas movimentações</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Data/hora</th>
+          <th>Produto</th>
+          <th>Tipo</th>
+          <th class="num">Qtd</th>
+          <th>Usuário</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaMovs"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+
+  if (!localStorage.getItem("token")) {
+    window.location.href = "/login";
+  }
+  document.getElementById("pagAnterior").addEventListener("click", () => mudarPagina(-1));
+  document.getElementById("pagProxima").addEventListener("click", () => mudarPagina(1));
+  document.getElementById("botaoBuscar").addEventListener("click", () => { pagina = 1; carregarProdutos(); });
+  document.getElementById("botaoCadastrar").addEventListener("click", cadastrarProduto);
+  document.getElementById("botaoMovimentar").addEventListener("click", movimentar);
+  iniciarTelaProdutos();
+</script>

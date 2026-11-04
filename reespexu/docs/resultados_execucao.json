@@ -1,0 +1,239 @@
+[
+  {
+    "numero": 1,
+    "titulo": "Saída com quantidade MAIOR que o saldo disponível",
+    "produto_id": 6,
+    "quantidade": 20,
+    "esperado": {
+      "status": 409,
+      "mensagem": "Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.",
+      "estoque_depois": 15,
+      "novas_movimentacoes": 0
+    },
+    "obtido": {
+      "status": 409,
+      "mensagem": "Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.",
+      "estoque_antes": 15,
+      "estoque_depois": 15,
+      "novas_movimentacoes": 0,
+      "ultima_movimentacao": null
+    },
+    "comparacoes": [
+      {
+        "item": "status",
+        "esperado": 409,
+        "obtido": 409,
+        "ok": true
+      },
+      {
+        "item": "mensagem",
+        "esperado": "Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.",
+        "obtido": "Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.",
+        "ok": true
+      },
+      {
+        "item": "estoque_depois",
+        "esperado": 15,
+        "obtido": 15,
+        "ok": true
+      },
+      {
+        "item": "novas_movimentacoes",
+        "esperado": 0,
+        "obtido": 0,
+        "ok": true
+      }
+    ],
+    "aprovado": true,
+    "evidencia": "docs/testes/cenario1.txt",
+    "executado_em": "04/11/2026 09:52:33"
+  },
+  {
+    "numero": 2,
+    "titulo": "Saída com quantidade MENOR que o saldo disponível",
+    "produto_id": 1,
+    "quantidade": 10,
+    "esperado": {
+      "status": 201,
+      "estoque_antes": 40,
+      "estoque_depois": 30,
+      "novas_movimentacoes": 1
+    },
+    "obtido": {
+      "status": 201,
+      "mensagem": "Saída registrada com sucesso.",
+      "estoque_antes": 40,
+      "estoque_depois": 30,
+      "novas_movimentacoes": 1,
+      "ultima_movimentacao": {
+        "data_hora": "2026-11-04T09:52:34",
+        "id": 9,
+        "produto": "Detergente neutro 500ml",
+        "produto_id": 1,
+        "quantidade": 10,
+        "tipo": "saida",
+        "usuario": "Operador",
+        "usuario_id": 2
+      }
+    },
+    "comparacoes": [
+      {
+        "item": "status",
+        "esperado": 201,
+        "obtido": 201,
+        "ok": true
+      },
+      {
+        "item": "estoque_antes",
+        "esperado": 40,
+        "obtido": 40,
+        "ok": true
+      },
+      {
+        "item": "estoque_depois",
+        "esperado": 30,
+        "obtido": 30,
+        "ok": true
+      },
+      {
+        "item": "novas_movimentacoes",
+        "esperado": 1,
+        "obtido": 1,
+        "ok": true
+      }
+    ],
+    "aprovado": true,
+    "evidencia": "docs/testes/cenario2.txt",
+    "executado_em": "04/11/2026 09:52:34"
+  },
+  {
+    "numero": 3,
+    "titulo": "Saída com quantidade IGUAL ao saldo disponível",
+    "produto_id": 8,
+    "quantidade": 12,
+    "esperado": {
+      "status": 201,
+      "estoque_antes": 12,
+      "estoque_depois": 0,
+      "novas_movimentacoes": 1
+    },
+    "obtido": {
+      "status": 201,
+      "mensagem": "Saída registrada com sucesso.",
+      "estoque_antes": 12,
+      "estoque_depois": 0,
+      "novas_movimentacoes": 1,
+      "ultima_movimentacao": {
+        "data_hora": "2026-11-04T09:52:34",
+        "id": 10,
+        "produto": "Ãlcool 70% 1L",
+        "produto_id": 8,
+        "quantidade": 12,
+        "tipo": "saida",
+        "usuario": "Operador",
+        "usuario_id": 2
+      }
+    },
+    "comparacoes": [
+      {
+        "item": "status",
+        "esperado": 201,
+        "obtido": 201,
+        "ok": true
+      },
+      {
+        "item": "estoque_antes",
+        "esperado": 12,
+        "obtido": 12,
+        "ok": true
+      },
+      {
+        "item": "estoque_depois",
+        "esperado": 0,
+        "obtido": 0,
+        "ok": true
+      },
+      {
+        "item": "novas_movimentacoes",
+        "esperado": 1,
+        "obtido": 1,
+        "ok": true
+      }
+    ],
+    "aprovado": true,
+    "evidencia": "docs/testes/cenario3.txt",
+    "executado_em": "04/11/2026 09:52:34"
+  },
+  {
+    "numero": 4,
+    "titulo": "Registro de data/hora e responsável na saída",
+    "produto_id": 2,
+    "quantidade": 5,
+    "esperado": {
+      "status": 201,
+      "estoque_depois": 20,
+      "novas_movimentacoes": 1,
+      "tipo_ultima_movimentacao": "saida",
+      "usuario_ultima_saida": "Operador",
+      "tem_data_hora": true
+    },
+    "obtido": {
+      "status": 201,
+      "mensagem": "Saída registrada com sucesso.",
+      "estoque_antes": 25,
+      "estoque_depois": 20,
+      "novas_movimentacoes": 1,
+      "ultima_movimentacao": {
+        "data_hora": "2026-11-04T09:52:35",
+        "id": 11,
+        "produto": "Ãgua sanitÃ¡ria 1L",
+        "produto_id": 2,
+        "quantidade": 5,
+        "tipo": "saida",
+        "usuario": "Operador",
+        "usuario_id": 2
+      }
+    },
+    "comparacoes": [
+      {
+        "item": "status",
+        "esperado": 201,
+        "obtido": 201,
+        "ok": true
+      },
+      {
+        "item": "estoque_depois",
+        "esperado": 20,
+        "obtido": 20,
+        "ok": true
+      },
+      {
+        "item": "novas_movimentacoes",
+        "esperado": 1,
+        "obtido": 1,
+        "ok": true
+      },
+      {
+        "item": "tipo_ultima_movimentacao",
+        "esperado": "saida",
+        "obtido": "saida",
+        "ok": true
+      },
+      {
+        "item": "usuario_ultima_saida",
+        "esperado": "Operador",
+        "obtido": "Operador",
+        "ok": true
+      },
+      {
+        "item": "tem_data_hora",
+        "esperado": true,
+        "obtido": true,
+        "ok": true
+      }
+    ],
+    "aprovado": true,
+    "evidencia": "docs/testes/cenario4.txt",
+    "executado_em": "04/11/2026 09:52:35"
+  }
+]

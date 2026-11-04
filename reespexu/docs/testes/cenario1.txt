@@ -1,0 +1,82 @@
+EVIDÊNCIA - CENÁRIO 1: Saída com quantidade MAIOR que o saldo disponível
+Executado em: 04/11/2026 09:52:32
+API: http://127.0.0.1:5000
+======================================================================
+
+[Passo 1] Login do operador
+
+>>> POST /auth/login
+    corpo: {"email": "operador@almoxarifado.com", "senha": "********"}
+<<< HTTP 200
+    {
+      "token": "<token omitido>",
+      "usuario": {
+        "id": 2,
+        "nome": "Operador",
+        "perfil": "operador"
+      }
+    }
+
+[Passo 2] Consulta do saldo ANTES da saída
+
+>>> GET /produtos/6
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Luva reutilizÃ¡vel para limpeza",
+      "id": 6,
+      "nome": "Luva de borracha",
+      "preco": 7.5,
+      "quantidade_estoque": 15
+    }
+
+[Passo 3] Solicitação de saída de 20 unidade(s)
+
+>>> POST /movimentacoes/saida
+    corpo: {"produto_id": 6, "quantidade": 20}
+    header: Authorization: Bearer <token>
+<<< HTTP 409
+    {
+      "detalhes": {
+        "disponivel": 15,
+        "solicitado": 20
+      },
+      "mensagem": "Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20."
+    }
+
+[Passo 4] Consulta do saldo DEPOIS da saída
+
+>>> GET /produtos/6
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "data_cadastro": "2026-11-04T09:52:32",
+      "descricao": "Luva reutilizÃ¡vel para limpeza",
+      "id": 6,
+      "nome": "Luva de borracha",
+      "preco": 7.5,
+      "quantidade_estoque": 15
+    }
+
+[Passo 5] Consulta do histórico de saídas do produto
+
+>>> GET /movimentacoes?produto_id=6&tipo=saida
+    header: Authorization: Bearer <token>
+<<< HTTP 200
+    {
+      "dados": [],
+      "limite": 10,
+      "pagina": 1,
+      "total": 0,
+      "total_paginas": 0
+    }
+
+======================================================================
+COMPARAÇÃO ESPERADO x OBTIDO
+  status: esperado=409 | obtido=409 -> OK
+  mensagem: esperado='Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.' | obtido='Saída não permitida: estoque insuficiente. Disponível: 15. Solicitado: 20.' -> OK
+  estoque_depois: esperado=15 | obtido=15 -> OK
+  novas_movimentacoes: esperado=0 | obtido=0 -> OK
+
+RESULTADO DO TESTE: APROVADO
