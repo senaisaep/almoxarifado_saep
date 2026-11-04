@@ -1,22 +1,25 @@
-from flask import Blueprint, render_template, session, abort
+from flask import Blueprint, abort, render_template, session
 
 sistema = Blueprint("sistema", __name__)
 
-@sistema.route ("/home")
+
+@sistema.route("/home")
 def home():
+    print(session)
     return render_template("home.html")
 
-@sistema.route ("/produtos")
+
+@sistema.route("/produtos")
 def produtos():
-    if session["usuarios"]["permissao"] == "produtos":
+    usuarios = session.get("usuarios")
+    if usuarios and usuarios.get("permissao") == "produtos":
         return render_template("produtos.html")
-    else:
-        abort(403)
+    abort(403)
 
-@sistema.route ("/movimentacoes")
-def produtos():
-    if session["usuarios"]["permissao"] == "movimentacoes":
+
+@sistema.route("/movimentacoes")
+def movimentacoes():  # Nome corrigido aqui
+    usuarios = session.get("usuarios")
+    if usuarios and usuarios.get("permissao") == "movimentacoes":
         return render_template("movimentacoes.html")
-    else:
-        abort(403)
-
+    abort(403)

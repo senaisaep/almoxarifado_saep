@@ -1,16 +1,10 @@
 from flask import Blueprint, render_template, request, session, redirect
 from models.usuarios import autenticar
-from db import conectar
 
 auth = Blueprint("auth", __name__)
 
 @auth.route("/", methods=["GET", "POST"])
 def login():
-    conexao = conectar()
-
-    produtos = conexao.execute("""
-        SELECT * FROM 
-    """)
 
     if request.method == "GET":
         return render_template("login.html")

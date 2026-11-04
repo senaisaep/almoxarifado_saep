@@ -1,17 +1,14 @@
-from flask import Flask, jsonify, Blueprint, render_template
-from estoque import estoque
+from flask import Flask, render_template
+from controllers.sistema_controller import sistema
 from controllers.auth_controller import auth
-from dotenv import load_dotenv
-from db import conectar, criar_banco
 
-load_dotenv()
 
 app = Flask(__name__)
 
-criar_banco()
+app.secret_key = 'sua_chave_secreta_aqui'
 
 app.register_blueprint(auth)
-app.register_blueprint(estoque)
+app.register_blueprint(sistema)
 
 @app.errorhandler(403)
 def erro_403(erro):
@@ -19,4 +16,6 @@ def erro_403(erro):
         "erro403.html"
     ), 403
 
-app.run(debug=True)
+
+if __name__ == "__main__":
+    app.run(debug=True)
