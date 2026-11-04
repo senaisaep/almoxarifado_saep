@@ -1,0 +1,69 @@
+CREATE DATABASE IF NOT EXISTS almoxarifado_saep
+CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
+USE almoxarifado_saep;
+
+
+DROP TABLE IF EXISTS movimentacoes;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS perfis;
+DROP TABLE IF EXISTS produtos;
+
+CREATE TABLE perfis (
+	id INT AUTO_INCREMENT PRIMARY KEY, 
+    nome VARCHAR(50)NOT NULL
+);
+
+INSERT INTO perfis (nome) VALUES
+('ADMINISTRADOR DO SISTEMA'),
+('OPERADOR DE ALMOXARIFADO');
+
+CREATE TABLE usuarios (
+	id INT AUTO_INCREMENT PRIMARY KEY, 
+    nome VARCHAR (100) NOT NULL,
+    email VARCHAR (100) NOT NULL UNIQUE,
+    senha VARCHAR (255) NOT NULL,
+    perfil_id INT NOT NULL,
+    CONSTRAINT fk_usuarios_perfis FOREIGN KEY (perfil_id) REFERENCES perfis(id)
+);
+
+INSERT INTO usuarios (nome, email, senha, perfil_id) VALUES
+('Administrador Geral', 'admin@senai.com', '123456', 1),
+('Operador Almoxarifado', 'operador@senai.com', '123456', 2);
+
+CREATE TABLE produtos (
+	id INT AUTO_INCREMENT PRIMARY KEY, 
+	nome VARCHAR(120) NOT NULL,
+    descricao TEXT,
+	preco DECIMAL (10,2) NOT NULL DEFAULT 0.00,
+    quantidade_estoque INT NOT NULL DEFAULT 0,
+    data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    
+INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES
+('Detergente','para limpeza', 3.50, 40),
+('Água sanitária','para limpeza', 5.90, 25),
+('Desinfetante','para limpeza', 8.75, 30),
+('Sabão em pó','para limpeza', 12.90, 18),
+('Esponja','para limpeza', 2.25, 90),
+('Pano','para limpeza', 6.50, 30),
+('Veja Multiuso','para limpeza', 6.00, 25);
+
+CREATE TABLE movimentacoes (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    tipo ENUM('entrada', 'saida') NOT NULL,
+    quantidade INT NOT NULL,
+    data_movimento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_movimentacoes_produtos FOREIGN KEY (produto_id) REFERENCES produtos(id),
+    CONSTRAINT fk_movimentacoes_usuarios FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    );
+    
+    INSERT INTO movimentacoes (produto_id, usuario_id, tipo, quantidade) VALUES
+    (1,1, 'entrada', 40), 
+    (2,1, 'entrada', 25),
+    (3,1, 'entrada', 30),
+    (4,1, 'entrada', 18),
+    (5,1, 'entrada', 90),
+    (6,1, 'entrada', 30),
+    (7,1, 'entrada', 25);
