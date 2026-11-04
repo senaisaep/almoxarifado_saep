@@ -1,125 +1,189 @@
-from flask import Blueprint, request, jsonify
-from src.config.db import conectar
+from flask import Blueprint, request, jsonify, session, render_template, redirect
+
+from src.services.estoque_service import (
+    listar_produtos,
+    buscar_produto,
+    cadastrar_produto,
+    atualizar_produto,
+    excluir_produto,
+    movimentar_estoque,
+    listar_movimentacoes
+)
 
 estoque = Blueprint("estoque", __name__)
 
-# Lógica de negócio e comandos SQL concentrados neste arquivo de rotas.
+
+def logado():
+    return "usuario_id" in session
+
+
+def administrador():
+    return session.get("perfil") == "administrador"
+
 
 @estoque.route("/produtos", methods=["GET"])
-def listar_produtos():
-    conexao = conectar()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM produtos ORDER BY id")
-    dados = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    return jsonify(dados), 200
+def produtos():
+    if not logado():
+        return redirect("/login")
+
+    nome = request.args.get("nome", "")
+    pagina = request.args.get("pagina", 1, type=int)
+
+    if pagina < 1:
+        pagina = 1
+
+    resultado = listar_produtos(nome, pagina)
+
+    if isinstance(resultado, dict):
+        lista_produtos = resultado.get("produtos", [])
+    else:
+        lista_produtos = resultado
+
+    return render_template(
+        "produtos.html",
+        produtos=lista_produtos
+    )
+
+
+@estoque.route("/produtos", methods=["POST"])
+def criar_produto():
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    if not administrador():
+        return jsonify({"erro": "Apenas administradores podem cadastrar produtos."}), 403
+
+    dados = request.get_json()
+
+    if not dados or not dados.get("nome"):
+        return jsonify({"erro": "Informe o nome do produto."}), 400
+
+    cadastrar_produto(
+        dados["nome"],
+        dados.get("descricao", ""),
+        dados.get("preco", 0),
+        dados.get("quantidade_estoque", 0)
+    )
+
+    return jsonify({"mensagem": "Produto cadastrado."}), 201
 
 
 @estoque.route("/produtos/<int:produto_id>", methods=["GET"])
 def consultar_produto(produto_id):
-    conexao = conectar()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM produtos WHERE id = %s", (produto_id,))
-    produto = cursor.fetchone()
-    cursor.close()
-    conexao.close()
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    produto = buscar_produto(produto_id)
+
     if produto is None:
-        return jsonify({"mensagem": "Produto não encontrado."}), 404
+        return jsonify({"erro": "Produto não encontrado."}), 404
+
     return jsonify(produto), 200
 
 
-@estoque.route("/produtos", methods=["POST"])
-def cadastrar_produto():
-    dados = request.get_json(silent=True) or {}
-    if not dados.get("nome"):
-        return jsonify({"mensagem": "O nome do produto é obrigatório."}), 400
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute(
-        "INSERT INTO produtos (nome, descricao, preco, quantidade_estoque) VALUES (%s, %s, %s, %s)",
-        (dados["nome"], dados.get("descricao", ""), dados.get("preco", 0),
-         dados.get("quantidade_estoque", 0))
-    )
-    conexao.commit()
-    novo_id = cursor.lastrowid
-    cursor.close()
-    conexao.close()
-    return jsonify({"mensagem": "Produto cadastrado.", "id": novo_id}), 201
-
-
 @estoque.route("/produtos/<int:produto_id>", methods=["PUT"])
-def atualizar_produto(produto_id):
-    dados = request.get_json(silent=True) or {}
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute(
-        """UPDATE produtos
-           SET nome=%s, descricao=%s, preco=%s, quantidade_estoque=%s
-           WHERE id=%s""",
-        (dados.get("nome"), dados.get("descricao", ""), dados.get("preco", 0),
-         dados.get("quantidade_estoque", 0), produto_id)
+def editar_produto(produto_id):
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    if not administrador():
+        return jsonify({"erro": "Apenas administradores podem editar produtos."}), 403
+
+    dados = request.get_json()
+
+    if not dados:
+        return jsonify({"erro": "Envie os dados do produto."}), 400
+
+    alterados = atualizar_produto(
+        produto_id,
+        dados.get("nome", ""),
+        dados.get("descricao", ""),
+        dados.get("preco", 0),
+        dados.get("quantidade_estoque", 0)
     )
-    conexao.commit()
-    alterados = cursor.rowcount
-    cursor.close()
-    conexao.close()
+
     if alterados == 0:
-        return jsonify({"mensagem": "Produto não encontrado ou sem alterações."}), 404
+        return jsonify({"erro": "Produto não encontrado ou sem alterações."}), 404
+
     return jsonify({"mensagem": "Produto atualizado."}), 200
 
 
 @estoque.route("/produtos/<int:produto_id>", methods=["DELETE"])
 def remover_produto(produto_id):
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("DELETE FROM produtos WHERE id=%s", (produto_id,))
-    conexao.commit()
-    removidos = cursor.rowcount
-    cursor.close()
-    conexao.close()
-    if removidos == 0:
-        return jsonify({"mensagem": "Produto não encontrado."}), 404
-    return jsonify({"mensagem": "Produto removido."}), 200
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    if not administrador():
+        return jsonify({"erro": "Apenas administradores podem excluir produtos."}), 403
+
+    produto = buscar_produto(produto_id)
+
+    if produto is None:
+        return jsonify({"erro": "Produto não encontrado."}), 404
+
+    try:
+        excluidos = excluir_produto(produto_id)
+    except Exception:
+        return jsonify({
+            "erro": "Não é possível excluir este produto. Verifique se ele possui movimentações."
+        }), 400
+
+    if excluidos == 0:
+        return jsonify({"erro": "Produto não encontrado."}), 404
+
+    return jsonify({"mensagem": "Produto excluído."}), 200
+
+
+@estoque.route("/produtos/<int:produto_id>/entrada", methods=["POST"])
+def entrada(produto_id):
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    dados = request.get_json() or {}
+    quantidade = dados.get("quantidade", 0)
+
+    if not isinstance(quantidade, int) or isinstance(quantidade, bool):
+        return jsonify({"erro": "A quantidade deve ser um número inteiro."}), 400
+
+    sucesso, mensagem = movimentar_estoque(
+        produto_id, "entrada", quantidade, session["usuario_id"]
+    )
+
+    if not sucesso:
+        return jsonify({"erro": mensagem}), 400
+
+    return jsonify({"mensagem": mensagem}), 200
+
+
+@estoque.route("/produtos/<int:produto_id>/saida", methods=["POST"])
+def saida(produto_id):
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
+
+    dados = request.get_json() or {}
+    quantidade = dados.get("quantidade", 0)
+
+    if not isinstance(quantidade, int) or isinstance(quantidade, bool):
+        return jsonify({"erro": "A quantidade deve ser um número inteiro."}), 400
+
+    sucesso, mensagem = movimentar_estoque(
+        produto_id, "saida", quantidade, session["usuario_id"]
+    )
+
+    if not sucesso:
+        return jsonify({"erro": mensagem}), 400
+
+    return jsonify({"mensagem": mensagem}), 200
 
 
 @estoque.route("/movimentacoes", methods=["GET"])
-def listar_movimentacoes():
-    conexao = conectar()
-    cursor = conexao.cursor(dictionary=True)
-    cursor.execute(
-        """SELECT m.id, m.produto_id, p.nome AS produto, m.tipo, m.quantidade
-           FROM movimentacoes m
-           INNER JOIN produtos p ON p.id=m.produto_id
-           ORDER BY m.id DESC"""
-    )
-    dados = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    return jsonify(dados), 200
+def movimentacoes():
+    if not logado():
+        return jsonify({"erro": "Faça login primeiro."}), 401
 
+    nome = request.args.get("nome", "")
+    data = request.args.get("data", "")
 
-@estoque.route("/movimentacoes/entrada", methods=["POST"])
-def registrar_entrada():
-    dados = request.get_json(silent=True) or {}
-    produto_id = dados.get("produto_id")
-    quantidade = dados.get("quantidade")
+    resultado = listar_movimentacoes(nome, data)
 
-    if not produto_id or not quantidade or int(quantidade) <= 0:
-        return jsonify({"mensagem": "Informe produto_id e quantidade maior que zero."}), 400
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute(
-        "INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES (%s, 'entrada', %s)",
-        (produto_id, int(quantidade))
-    )
-    cursor.execute(
-        "UPDATE produtos SET quantidade_estoque=quantidade_estoque+%s WHERE id=%s",
-        (int(quantidade), produto_id)
-    )
-    conexao.commit()
-    cursor.close()
-    conexao.close()
-    return jsonify({"mensagem": "Entrada registrada com sucesso."}), 201
+    return jsonify(resultado), 200

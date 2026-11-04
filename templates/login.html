@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Almoxarifado</title>
+</head>
+<body>
+
+    <h1>Almoxarifado</h1>
+    <h2>Login</h2>
+
+    <form action="/login" method="POST">
+        <label>E-mail:</label>
+        <input type="email" name="email" required>
+
+        <br><br>
+
+        <label>Senha:</label>
+        <input type="password" name="senha" required>
+
+        <br><br>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    {% if erro %}
+        <p>{{ erro }}</p>
+    {% endif %}
+
+</body>
+</html>

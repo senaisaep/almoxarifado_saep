@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Produtos - Almoxarifado</title>
+
+</head>
+
+<body>
+
+    <h1>Controle de Estoque</h1>
+
+    <p>Bem-vindo, {{ session['nome'] }}!</p>
+
+    <a href="/logout">Sair</a>
+
+    <h2>Lista de Produtos</h2>
+
+    <table border="1">
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Nome</th>
+
+            <th>Descrição</th>
+
+            <th>Preço</th>
+
+            <th>Estoque</th>
+
+        </tr>
+
+        {% for produto in produtos %}
+
+        <tr>
+
+            <td>{{ produto.id }}</td>
+
+            <td>{{ produto.nome }}</td>
+
+            <td>{{ produto.descricao }}</td>
+
+            <td>R$ {{ produto.preco }}</td>
+
+            <td>{{ produto.quantidade_estoque }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+
+</html>
